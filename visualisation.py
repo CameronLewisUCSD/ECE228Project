@@ -1,0 +1,1 @@
+# in this file we will place our funciton related to graphing losses and other information from the train file
