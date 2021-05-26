@@ -1,0 +1,1 @@
+#In this file we will place the architecture of our network
