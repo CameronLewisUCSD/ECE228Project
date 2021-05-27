@@ -6,6 +6,7 @@ import h5py
 import numpy as np
 import pandas as pd
 from torch.utils.data import Dataset, DataLoader, Subset
+from torch.utils.data.sampler import SubsetRandomSampler
 from torchvision import transforms
 from tqdm import tqdm
 
@@ -20,7 +21,7 @@ class H5SeismicDataset(Dataset):
     def __len__(self):
         with h5py.File(self.filepath, 'r') as f:
             DataSpec = '/4.0/Spectrogram'
-            return f[DataSpec][idx].len()
+            return f[DataSpec].len()
 
 
     def __getitem__(self, idx): 
