@@ -2,44 +2,89 @@
 #assume model and 
 #epoch loop
 import torch
-def pretrain(model,datalaoders,epochs=50,lr=0.01):
-    optim = torch.optim.Adam()
-    loss = torch.losses.MSE()
+import numpy as np
+
+loss_train_epoch=[]
+loss_validation_epoch=[]
+loss_testing_epoch=[]
+print_every=10
+def pretrain(model,dataloaders,device, epochs=10,lr=0.001):
+    optim = torch.optim.Adam(model.parameters())
+    loss = torch.nn.MSELoss()
     for e in range(epochs):
         #loop over train
+        loss_train=[]
+        loss_validation=[]
+        loss_testing=[]
         model.train(True)
+        for idx,batch in enumerate(dataloaders[0]):
 
-        for idx,batch in enumerate(dataloaders[0])
-            model(batch)
-            loss.backward()
-            optim.step()
+            with torch.set_grad_enabled(True):
+                _,batch= batch
+    #             batch.to(device)
+                x_rec, _=model(batch)
+                x=batch
+                loss_mse = loss(x_rec, x)
+                loss_mse.backward()
+                optim.step()
+                loss_train.append(loss_mse.cpu().detach())
+                
+                
 
             if idx %print_every==0:
                 #store output
-
-
-                loss_train.append(loss_valid.cpu().detach())
-
+                print("epoch:  ",e," train loss: ",loss_train[idx])
             pass
 
         #loop over valid
 
         model.train(False)
-        for idx,batch in enumerate(dataloaders[1])
-            outValid = model(batch)
-            loss_valid = loss.backward()
+        loss = torch.nn.MSELoss()
+        for idx,batch in enumerate(dataloaders[1]):
+#             outValid = model(batch)
+#             loss_valid = loss.backward()
+            with torch.no_grad():
+                _,batch= batch
+    #             batch.to(device)
+                x_rec, _=model(batch)
+                x=batch
+                loss_mse = loss(x_rec, x)
+                loss_mse.backward()
+                optim.step()
+                loss_validation.append(loss_mse.cpu().detach())
 
             if idx %print_every==0:
                 #store output
-                loss_validation.append(loss_valid.cpu().detach())
+                print("epoch:  ",e," val loss: ",loss_validation[idx])
+                
             pass
         pass
+    
+    #loop over train
     model.eval(True)
-    for idx,batch in enumerate(dataloaders[2]) #dataloaders[2] = testing set
-        model(batch)
+    loss = torch.nn.MSELoss()                  
+    for idx,batch in enumerate(dataloaders[2]): #dataloaders[2] = testing set
+        with torch.no_grad():
+            _,batch= batch
+    #             batch.to(device)
+            x_rec, _=model(batch)
+            x=batch
+            loss_mse = loss(x_rec, x)
+            loss_mse.backward()
+            optim.step()
+            loss_testing.append(loss_mse.cpu().detach())
+            
         if idx %print_every==0:
-                #store output
-                loss_testing.append(loss_valid.cpu().detach())
+            #store output
+            print("epoch:  ",e," val loss: ",loss_testing[idx])
         pass
+    
+    
+    loss_train_epoch.append(sum(loss_train)/len(loss_train))
+    loss_validation_epoch.append(sum(loss_validation)/len(loss_validation))
+    loss_testing_epoch.append(sum(loss_tetsing)/len(loss_testing))
+    print('\n========================================================')
+    print('train loss', loss_train_epoch[e],'val_loss ', loss_validation_epoch[e])
+    print('========================================================\n')
 
     
