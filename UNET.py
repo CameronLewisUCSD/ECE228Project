@@ -1,85 +1,6 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
-class Contraction(nn.Module):
-    """
-    Description: 
-    Inputs:
-        - Input data (spectrograms)
-    Outputs:
-        - Latent feature space data
-    """
-    def __init__(self):
-        super(Encoder, self).__init__()
-        self.encoder = nn.Sequential(
-            #c1
-            nn.Conv2d(1, 8, kernel_size=(3,3), stride=(2,2), padding=(1,1)),
-            nn.ReLU(True),
-            #c2
-            nn.Conv2d(8, 16, kernel_size=(3,3), stride=(2,2), padding=(1,1)),
-            nn.ReLU(True),
-            #c3
-            nn.Conv2d(16, 32, kernel_size=(3,3), stride=(2,2), padding=(1,1)),
-            nn.ReLU(True),
-            #c3
-            nn.Conv2d(32, 64, kernel_size=(3,3), stride=(2,2), padding=(1,1)),
-            nn.ReLU(True),
-            #c4
-            nn.Conv2d(64, 128, kernel_size=(3,3), stride=(2,2), padding=(1,0)),
-            nn.ReLU(True),
-            
-            nn.Flatten(),
-            nn.Linear(1152, 9),
-            nn.ReLU(True)
-        )
-
-    def forward(self, x):
-        x = self.encoder(x)
-        return x
-    
-class Expansion(nn.Module):
-    """
-    Description: 
-    Inputs:
-        - Latent space data
-    Outputs:
-        - Reconstructed data
-    """
-    def __init__(self):
-        super(Decoder, self).__init__()
-        self.latent2dec = nn.Sequential(
-            nn.Linear(9, 1152),
-            nn.ReLU(True)
-        )
-        self.decoder = nn.Sequential(
-            #u6
-            nn.ConvTranspose2d(128, 64, kernel_size=(3,3), stride=(2,2), padding=(1,0)), # <---- Experimental
-            nn.ReLU(True),  # <---- Experimental
-            #u7
-            nn.ConvTranspose2d(64, 32, kernel_size=(3,3), stride=(2,2), padding=(0,1)),
-            nn.ReLU(True),
-            #u8
-            nn.ConvTranspose2d(32, 16, kernel_size=(3,3), stride=(2,2), padding=(0,1)),
-            nn.ReLU(True),
-            #u9
-            nn.ConvTranspose2d(16, 8, kernel_size=(3,3), stride=(2,2), padding=(0,0)),
-            nn.ReLU(True),
-            #u10
-            nn.ConvTranspose2d(8, 1, kernel_size=(3,3), stride=(2,2), padding=(0,1)),
-        )
-
-    def forward(self, x):
-        x = self.latent2dec(x)
-        x = x.view(-1, 128, 3, 3)
-        x = self.decoder(x)
-        return x[:,:,4:-4,1:]
-
 class UNET(nn.Module):
     """
-    Description: Autoencoder model; combines encoder and decoder layers.
+    Description:
     Inputs:
         - Input data (spectrograms)
     Outputs:
@@ -87,12 +8,46 @@ class UNET(nn.Module):
         - Latent space data
     """
     def __init__(self):
-        super(AEC, self).__init__()
-        self.contraction = Contraction()
-        self.expansion = Expansion()
+        super(UNET, self).__init__()
+
+        #down
+        self.c1 = nn.Conv2d(1, 8, kernel_size=(3,3), stride=(2,2), padding=(1,1))
+        self.a1 = nn.ReLU(True)(self.c1)
+
+        self.c2 = nn.Conv2d(8, 16, kernel_size=(3,3), stride=(2,2), padding=(1,1))(self.a1)
+        self.a2 = nn.ReLU(True)(self.c1)
+
+        self.c3 = nn.Conv2d(16, 32, kernel_size=(3,3), stride=(2,2), padding=(1,1))(self.a2)
+        self.a3 = nn.ReLU(True)(self.c1)
+
+        self.c4 = nn.Conv2d(32, 64, kernel_size=(3,3), stride=(2,2), padding=(1,1))(self.a3)
+        self.a4 = nn.ReLU(True)(self.c1)
+
+        self.c5 = nn.Conv2d(64, 128, kernel_size=(3,3), stride=(2,2), padding=(1,0))(self.a4)
+
+        #up
+        self.c6=nn.ConvTranspose2d(128, 64, kernel_size=(3,3), stride=(2,2), padding=(1,0))(self.c5)
+        self.a6=nn.ReLU(True)(self.c6)
+        self.u6=concatenate([self.a6, self.a4])
+
+        self.c7=nn.ConvTranspose2d(64, 32, kernel_size=(3,3), stride=(2,2), padding=(0,1))(self.u6)
+        self.a7=nn.ReLU(True)(self.c7)
+        self.u7=concatenate([self.a7, self.a3])
+
+        self.c8=nn.ConvTranspose2d(32, 16, kernel_size=(3,3), stride=(2,2), padding=(0,1))(self.u7)
+        self.a8=nn.ReLU(True)(self.c8)
+        self.u8=concatenate([self.a8, self.a2])
+
+        self.c9=nn.ConvTranspose2d(16, 8, kernel_size=(3,3), stride=(2,2), padding=(0,0))(self.u8)
+        self.a9=nn.ReLU(True)(self.c9)
+        self.u9= concatenate([self.a9, self.a1])
+
+        self.c10=nn.ConvTranspose2d(8, 1, kernel_size=(3,3), stride=(2,2), padding=(0,1))(self.u9)
 
     def forward(self, x):
-        z = self.contraction(x)
+        x1 = self.contraction1(x)
+        x2 = self.contraction2(x1)
+        x3 = self.contraction3(x2)
+        x4 = self.contraction4(x3)
         x = self.expansion(z)
         return x, z
-
