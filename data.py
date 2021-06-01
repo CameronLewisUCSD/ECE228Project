@@ -57,6 +57,7 @@ def getSamplerTrainValidTestSplit(H5DatasetLen: int,valid_perc,test_perc) -> lis
     test_sampler = SubsetRandomSampler(test_idx)
     return [train_sampler,valid_sampler,test_sampler]
 
+#batch size was 512, Heather changed to 1
 def getDataloaderSplit(H5Dataset, valid_perc,test_perc, batch_size=512, num_workers=4, pin_memory=True):
     # If using CUDA or a GPU, num workers needs to be 1 for proper precetage split
     #Pin memory is true for correct random split on a CUDA machine.
