@@ -26,6 +26,7 @@ def pretrain(model,dataloaders,device,lr=0.001, epochs=10):
                 x_rec, _=model(batch)
                 x=batch
                 loss_mse = loss(x_rec, x)
+                optim.zero_grad()
                 loss_mse.backward()
                 optim.step()
                 loss_train.append(loss_mse.cpu().detach())
