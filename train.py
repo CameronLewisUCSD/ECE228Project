@@ -6,7 +6,7 @@ import numpy as np
 
 
 print_every=100
-def pretrain(model,dataloaders,device, epochs=10,lr=0.001):
+def pretrain(model,dataloaders,device,lr=0.001, epochs=10):
     loss_train_epoch=[]
     loss_validation_epoch=[]
     loss_testing_epoch=[]
