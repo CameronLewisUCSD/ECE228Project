@@ -6,7 +6,7 @@ import numpy as np
 
 
 print_every=100
-def pretrain(model,dataloaders,device,lr=0.001, epochs=10):
+def pretrain(model,dataloaders,device,lr=0.001, epochs=10,epsilon=0.00001):
     loss_train_epoch=[]
     loss_validation_epoch=[]
     loss_testing_epoch=[]
@@ -30,8 +30,11 @@ def pretrain(model,dataloaders,device,lr=0.001, epochs=10):
                 loss_mse.backward()
                 optim.step()
                 loss_train.append(loss_mse.cpu().detach())
-                
-                
+            
+            #early stop loss
+            if abs(loss_train[idx]-loss_train[idx-1]) < epsilon:
+                break
+
 
             if idx %print_every==0:
                 #store output
@@ -52,7 +55,8 @@ def pretrain(model,dataloaders,device,lr=0.001, epochs=10):
                 x=batch
                 loss_mse = loss(x_rec, x)
                 loss_validation.append(loss_mse.cpu().detach())
-
+            if abs(loss_validation[idx]-loss_validation[idx-1]) < epsilon:
+                break
             if idx %print_every==0:
                 #store output
                 print("epoch:  ",e," val loss: ",loss_validation[idx])
@@ -70,7 +74,8 @@ def pretrain(model,dataloaders,device,lr=0.001, epochs=10):
                 x=batch
                 loss_mse = loss(x_rec, x)
                 loss_testing.append(loss_mse.cpu().detach())
-
+            if abs(loss_testing[idx]-loss_testing[idx-1]) < epsilon:
+                break
             if idx %print_every==0:
                 #store output
                 print("epoch:  ",e," val loss: ",loss_testing[idx])

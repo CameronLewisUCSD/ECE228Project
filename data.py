@@ -99,7 +99,7 @@ class SpecgramShaper(object):
 class SpecgramToTensor(object):
     """Convert ndarrays in sample to Tensors."""
     def __call__(self, X):
-        return torch.from_numpy(X)
+        return torch.from_numpy(X).type(torch.DoubleTensor)
 
     
 
