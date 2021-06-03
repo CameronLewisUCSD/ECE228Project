@@ -34,7 +34,7 @@ def clustTrain(model,dataloaders=None,print_every=10, latentSpaceArray=None):
 #use the results of this to get the model.gmm.predict(z_array) and tsne(z_array) for final visualizations
 def getLatentFeatureSpaceDataset(model,dataloader,double=True):
     model.to(torch.device('cpu'))
-    z_array = np.zeros((len(dataloader.dataset), 9), dtype=np.float64)
+    z_array = np.zeros((dataloader.len, 9), dtype=np.float64)
     #labels_prev = np.zeros((len(dataloaders[2].dataset), 9), dtype=np.float32)
     bsz = dataloader.batch_size
     for b, batch in enumerate(dataloader):

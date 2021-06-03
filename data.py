@@ -63,8 +63,11 @@ def getDataloaderSplit(H5Dataset, valid_perc,test_perc, batch_size=512, num_work
     #Pin memory is true for correct random split on a CUDA machine.
     samplers = getSamplerTrainValidTestSplit(len(H5Dataset),valid_perc,test_perc)
     DEC_loader_train = DataLoader(H5Dataset, sampler=samplers[0], batch_size=batch_size, num_workers=num_workers, pin_memory=pin_memory)
+    DEC_loader_train.len = len(samplers[0])
     DEC_loader_valid = DataLoader(H5Dataset, sampler=samplers[1], batch_size=batch_size, num_workers=num_workers, pin_memory=pin_memory)
+    DEC_loader_valid.len = len(samplers[1])
     DEC_loader_test =  DataLoader(H5Dataset, sampler=samplers[2], batch_size=batch_size, num_workers=num_workers, pin_memory=pin_memory)
+    DEC_loader_test.len =  len(samplers[2])
     return [DEC_loader_train,DEC_loader_valid, DEC_loader_test]
 
 class SpecgramShaper(object):

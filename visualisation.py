@@ -1,6 +1,15 @@
 # in this file we will place our funciton related to graphing losses and other information from the train file
 from matplotlib.pylab import subplots
-
+import matplotlib as mpl
+import matplotlib.gridspec as gridspec
+from matplotlib.patches import ConnectionPatch
+import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+import numpy as np
+import torch
+import pandas as pd
+from cuml import TSNE
 
 def get_graphs(val_loss, train_loss, path):
     fig,axs=subplots(1,1)
