@@ -297,7 +297,8 @@ class UNET(nn.Module):
         diffY = x4pre.size()[2] - xd4.size()[2]
         diffX = x4pre.size()[3] - xd4.size()[3] 
         xd4 = f.pad(xd4,[diffX//2, diffX -diffX//2, diffY//2, diffY- diffY//2])
-        xd4=torch.cat([xd4, x4pre],dim=1)  
+        xd4=torch.cat([xd4, x4pre],dim=1)
+        xd4=self.ddrop4(xd4)
         xd4=f.relu(self.dc42(xd4))
         xd4=f.relu(self.dc43(xd4))
         
@@ -308,7 +309,8 @@ class UNET(nn.Module):
         diffX = x3pre.size()[3] - xd3.size()[3] 
         xd3 = f.pad(xd3,[diffX//2, diffX -diffX//2, diffY//2, diffY- diffY//2])
 
-        xd3=torch.cat([xd3, x3pre],dim=1)    
+        xd3=torch.cat([xd3, x3pre],dim=1)
+        xd3=self.ddrop3(xd3)
         xd3=f.relu(self.dc32(xd3))
         xd3=f.relu(self.dc33(xd3))
 
@@ -321,6 +323,7 @@ class UNET(nn.Module):
         diffX = x2pre.size()[3] - xd2.size()[3] 
         xd2 = f.pad(xd2,[diffX//2, diffX -diffX//2, diffY//2, diffY- diffY//2])
         xd2=torch.cat([xd2, x2pre],dim=1)
+        xd2=self.ddrop2(xd2)
         xd2=f.relu(self.dc22(xd2))
         xd2=f.relu(self.dc23(xd2))
 
@@ -331,6 +334,7 @@ class UNET(nn.Module):
         diffX = x1pre.size()[3] - xd1.size()[3] 
         xd1 = f.pad(xd1,[diffX//2, diffX -diffX//2, diffY//2, diffY- diffY//2])
         xd1=torch.cat([xd1, x1pre],dim=1)
+        xd1=self.ddrop1(xd1)
         xd1=f.relu(self.dc12(xd1))
         xd1=f.relu(self.dc13(xd1))
         
