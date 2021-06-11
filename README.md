@@ -1,3 +1,5 @@
 # ECE228Project
 
-The Workflow.ipynb is meant to host the final run of our script, the first upload of the file contained potentially useful code snippets from https://github.com/NeptuneProjects/RISCluster Feel free to remove them and place the necessary information.
+This project edited the Project hosted at: https://github.com/NeptuneProjects/RISCluster 
+
+The goal is to replace the clustering layer with a GMM and to test the results using a U-net vs using a traditional autoencoder.
