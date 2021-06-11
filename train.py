@@ -7,6 +7,8 @@ import numpy as np
 
 print_every=100
 def pretrain(model,dataloaders,device,lr=0.001, epochs=10,absoluteLossThresh=None):
+    lt = []
+    lv = []
     loss_train_epoch=[]
     loss_validation_epoch=[]
     loss_testing_epoch=[]
@@ -30,6 +32,8 @@ def pretrain(model,dataloaders,device,lr=0.001, epochs=10,absoluteLossThresh=Non
                 loss_mse.backward()
                 optim.step()
                 loss_train.append(loss_mse.cpu().detach())
+                if idx%3==0 and idx<504:
+                    lt.append(loss_mse.cpu().detach())
             
             #early stop loss
             if absoluteLossThresh is not None and loss_train[idx] < absoluteLossThresh:
@@ -55,6 +59,7 @@ def pretrain(model,dataloaders,device,lr=0.001, epochs=10,absoluteLossThresh=Non
                 x=batch
                 loss_mse = loss(x_rec, x)
                 loss_validation.append(loss_mse.cpu().detach())
+                lv.append(loss_mse.cpu().detach())
             if absoluteLossThresh is not None and loss_validation[idx] < absoluteLossThresh:
                 break
             if idx %print_every==0:
@@ -89,7 +94,7 @@ def pretrain(model,dataloaders,device,lr=0.001, epochs=10,absoluteLossThresh=Non
         print('train loss', loss_train_epoch[e],'val_loss ', loss_validation_epoch[e])
         print('========================================================\n')
         
-    return(loss_train_epoch,loss_validation_epoch,loss_testing_epoch)
+    return(loss_train_epoch,loss_validation_epoch,loss_testing_epoch,lv,lt)
 
 
     
